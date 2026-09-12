@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FeedForward</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal: #2dd6c4;
+    --glass-bg: rgba(24, 30, 38, 0.34);
+    --glass-bg-soft: rgba(24, 30, 38, 0.22);
+    --glass-border: rgba(255,255,255,0.22);
+    --text: #F3F6F7;
+    --text-dim: rgba(243,246,247,0.62);
+    --text-faint: rgba(243,246,247,0.4);
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; height:100%; font-family:'Inter',system-ui,sans-serif; }
+
+  body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+
+  background-image: url("https://img.magnific.com/free-vector/paper-cut-abstract-background_474888-6378.jpg?semt=ais_hybrid&w=740&q=80");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+  /* ---------- Unique background: layered contour flow + aurora glow ---------- */
+  .bg-glow{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(700px 500px at 12% 15%, rgba(62,207,142,0.16), transparent 60%),
+      radial-gradient(600px 480px at 88% 82%, rgba(30,122,92,0.22), transparent 60%),
+      radial-gradient(900px 700px at 50% 100%, rgba(13,59,51,0.35), transparent 70%);
+  }
+  .bg-lines{
+    position:fixed; inset:0; z-index:0;
+    opacity: 0.55;
+  }
+  .bg-vignette{
+    position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 1200px 800px at 50% 40%, transparent 40%, rgba(5,10,15,0.75) 100%);
+  }
+
+  /* decorative device-frame border, like the reference shot */
+  .frame{
+    position:fixed; inset: 14px;
+    border: 1.5px solid rgba(45,214,196,0.55);
+    border-radius: 26px;
+    pointer-events:none;
+    z-index:1;
+  }
+  .frame::after, .frame::before{
+    content:''; position:absolute; width:26px; height:1.5px;
+    background: rgba(45,214,196,0.7);
+  }
+  .frame::before{ bottom:-1px; right:52px; transform: rotate(45deg); transform-origin: right; }
+  .frame::after{ bottom:-1px; right:20px; transform: rotate(45deg); transform-origin: right; }
+
+  .stack{
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center;
+    gap:16px;
+    width: 100%;
+    max-width: 460px;
+    padding: 0 20px;
+  }
+
+  /* ---------- Glass modal ---------- */
+  .modal{
+    width:100%;
+    background: var(--glass-bg);
+    backdrop-filter: blur(22px) saturate(160%);
+    -webkit-backdrop-filter: blur(22px) saturate(160%);
+    border: 1px solid var(--glass-border);
+    border-radius: 26px;
+    box-shadow: 0 25px 60px -20px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.15);
+    overflow:hidden;
+    color: var(--text);
+  }
+
+  .modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 18px 14px;
+  }
+  .icon-btn{
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.08);
+    border: none; cursor:pointer;
+    color: var(--text);
+    transition: background .15s ease;
+  }
+  .icon-btn:hover{ background: rgba(255,255,255,0.18); }
+  .icon-btn:disabled{ opacity:.35; cursor:default; }
+  .icon-btn:disabled:hover{ background: rgba(255,255,255,0.08); }
+
+  .modal-title{
+    display:flex; align-items:center; gap:8px;
+    font-size: 15px; font-weight:600; color: var(--text-dim);
+  }
+
+  /* ---------- Drop screen ---------- */
+  .drop-screen{ padding: 10px 22px 26px; }
+  .drop-area{
+    border-radius: 18px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 46px 20px 34px;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    transition: background .2s ease, border-color .2s ease;
+    cursor:pointer;
+  }
+  .drop-area.drag{
+    background: rgba(45,214,196,0.08);
+    border-color: rgba(45,214,196,0.5);
+  }
+  .drop-title{ font-size:17px; font-weight:600; margin: 0 0 4px; }
+  .drop-sub{ font-size: 13px; color: var(--text-dim); margin: 0 0 26px; }
+
+  .icon-row{ display:flex; align-items:center; gap:18px; margin-bottom: 26px; }
+
+  .or-text{ font-size:12.5px; color: var(--text-faint); margin-bottom: 18px; }
+
+  .pill-btn{
+    font-family:'Inter',sans-serif;
+    font-size: 13.5px; font-weight:500;
+    color: var(--text);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 11px 22px;
+    border-radius: 999px;
+    cursor:pointer;
+    transition: background .15s ease, transform .1s ease;
+  }
+  .pill-btn:hover{ background: rgba(255,255,255,0.2); }
+  .pill-btn:active{ transform: scale(0.97); }
+
+  input[type=file]{ display:none; }
+
+  /* ---------- List screen ---------- */
+  .list-screen{ display:none; }
+  .file-list{
+    max-height: 300px;
+    overflow-y:auto;
+    padding: 0 18px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .file-list::-webkit-scrollbar{ width:5px; }
+  .file-list::-webkit-scrollbar-thumb{ background: rgba(255,255,255,0.2); border-radius:3px; }
+
+  .file-row{
+    display:flex; align-items:center; gap:12px;
+    padding: 10px 6px;
+    animation: rowIn .3s ease both;
+  }
+  @keyframes rowIn{ from{ opacity:0; transform: translateX(-6px);} to{ opacity:1; transform:none; } }
+
+  .file-name{ font-size: 14.5px; font-weight:600; margin:0; }
+  .file-meta{ font-size: 12px; color: var(--text-faint); margin: 1px 0 0; }
+  .file-info{ flex:1; min-width:0; }
+  .file-info .file-name{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  .pct-pill{
+    font-size: 12.5px; font-weight:600; color: var(--text);
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 6px 14px; border-radius: 999px;
+    min-width: 46px; text-align:center;
+    flex-shrink:0;
+  }
+  .row-x{
+    width:26px; height:26px; border-radius:50%;
+    background: rgba(255,255,255,0.08);
+    border:none; color: var(--text-dim); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    transition: background .15s ease;
+  }
+  .row-x:hover{ background: rgba(255,255,255,0.18); }
+
+  .modal-actions{
+    display:flex; gap:12px;
+    padding: 18px 18px 20px;
+  }
+  .action-btn{
+    flex:1;
+    font-family:'Inter',sans-serif;
+    font-size: 14px; font-weight:600;
+    padding: 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.16);
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    cursor:pointer;
+    transition: background .15s ease;
+  }
+  .action-btn:hover{ background: rgba(255,255,255,0.16); }
+  .action-btn.primary{
+    background: rgba(45,214,196,0.18);
+    border-color: rgba(45,214,196,0.4);
+  }
+  .action-btn.primary:hover{ background: rgba(45,214,196,0.28); }
+
+  /* ---------- Floating status bar ---------- */
+  .status-bar{
+    width:100%;
+    background: var(--glass-bg-soft);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    padding: 14px 18px 16px;
+    color: var(--text);
+    display:none;
+  }
+  .status-top{
+    display:flex; align-items:center; justify-content:space-between;
+    font-size: 13px; font-weight:500; margin-bottom: 10px;
+  }
+  .status-left{ display:flex; align-items:center; gap:8px; color: var(--text-dim); }
+
+  .spinner{
+    width:14px; height:14px; border-radius:50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: var(--teal);
+    animation: spin .8s linear infinite;
+    flex-shrink:0;
+    position:relative;
+  }
+  .spinner.paused{ animation-play-state: paused; }
+  .spinner.done{
+    animation: none;
+    border-color: var(--teal);
+    background: var(--teal);
+  }
+  .spinner.done::after{
+    content:'';
+    position:absolute; left:3px; top:1px;
+    width:4px; height:7px;
+    border: solid #0b1613;
+    border-width: 0 1.6px 1.6px 0;
+    transform: rotate(45deg);
+  }
+
+  .status-track{
+    height:5px; border-radius:3px; background: rgba(255,255,255,0.12);
+    overflow:hidden; margin-bottom:8px;
+  }
+  .status-fill{
+    height:100%; width:0%; border-radius:3px;
+    background: linear-gradient(90deg, var(--teal), #7ef2e4);
+    transition: width .25s ease;
+  }
+  .status-bottom{
+    display:flex; justify-content:space-between;
+    font-size: 11.5px; color: var(--text-faint);
+  }
+
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<svg class="bg-lines" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3ECF8E" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#3ECF8E" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lg2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5EEAD4" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#5EEAD4" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="M-100 700 C 250 600, 450 800, 800 650 S 1350 500, 1700 620" stroke="url(#lg1)" stroke-width="1.4" fill="none"/>
+  <path d="M-100 760 C 280 660, 480 860, 830 700 S 1380 560, 1700 680" stroke="url(#lg1)" stroke-width="1" fill="none"/>
+  <path d="M-100 120 C 300 260, 520 40, 900 180 S 1400 320, 1700 160" stroke="url(#lg2)" stroke-width="1.2" fill="none"/>
+  <path d="M-100 60 C 320 210, 540 -20, 930 130 S 1420 260, 1700 100" stroke="url(#lg2)" stroke-width="0.8" fill="none"/>
+  <g stroke="#3ECF8E" stroke-opacity="0.25">
+    <circle cx="230" cy="180" r="1.6" fill="#3ECF8E" fill-opacity="0.6"/>
+    <circle cx="410" cy="120" r="1.2" fill="#3ECF8E" fill-opacity="0.5"/>
+    <circle cx="1180" cy="760" r="1.6" fill="#5EEAD4" fill-opacity="0.6"/>
+    <circle cx="1340" cy="700" r="1.2" fill="#5EEAD4" fill-opacity="0.5"/>
+    <line x1="230" y1="180" x2="410" y2="120"/>
+    <line x1="1180" y1="760" x2="1340" y2="700"/>
+  </g>
+</svg>
+<div class="bg-vignette"></div>
+<div class="frame"></div>
+
+<div class="stack">
+
+  <div class="modal">
+    <div class="modal-head">
+      <button class="icon-btn" id="backBtn" title="Back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="modal-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 18a4.5 4.5 0 01-.6-8.96A5.5 5.5 0 0117 8.06 4 4 0 0117.5 16H7z" stroke="currentColor" stroke-width="1.6" fill="rgba(243,246,247,0.15)"/></svg>
+        FeedForward
+      </div>
+      <button class="icon-btn" id="closeBtn" title="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- DROP SCREEN -->
+    <div class="drop-screen" id="dropScreen">
+      <div class="drop-area" id="dropArea">
+        <div class="drop-title">Drop File here</div>
+        <div class="drop-sub">to upload file in Cloud</div>
+
+        <div class="icon-row">
+          <svg width="46" height="38" viewBox="0 0 46 38" fill="none">
+            <path d="M2 8a4 4 0 014-4h9l4 5h21a4 4 0 014 4v17a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" fill="url(#folderGrad)"/>
+            <defs>
+              <linearGradient id="folderGrad" x1="2" y1="4" x2="44" y2="34" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6BD3FF"/>
+                <stop offset="1" stop-color="#2B9FE0"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <svg width="42" height="34" viewBox="0 0 42 34" fill="none">
+            <path d="M11 26a7 7 0 01-1-13.9A8.5 8.5 0 0126 9.2 6 6 0 0126.8 21" stroke="rgba(243,246,247,0.65)" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M21 15v13m0 0l-4.5-4.5M21 28l4.5-4.5" stroke="rgba(243,246,247,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div class="or-text">or</div>
+        <button class="pill-btn" id="browseBtn">Select from your computer</button>
+        <input type="file" id="fileInput" multiple>
+      </div>
+    </div>
+
+    <!-- LIST SCREEN -->
+    <div class="list-screen" id="listScreen">
+      <div class="file-list" id="fileList"></div>
+      <div class="modal-actions">
+        <button class="action-btn" id="cancelBtn">Cancel</button>
+        <button class="action-btn primary" id="pauseBtn">Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING STATUS BAR -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-top">
+      <div class="status-left">
+        <div class="spinner" id="spinner"></div>
+        <span id="statusLabel">Uploading 0/0</span>
+      </div>
+      <span id="statusPct">0%</span>
+    </div>
+    <div class="status-track"><div class="status-fill" id="statusFill"></div></div>
+    <div class="status-bottom">
+      <span id="statusSize">0MB of 0MB</span>
+      <span id="statusTime">0 sec</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const dropArea   = document.getElementById('dropArea');
+  const fileInput  = document.getElementById('fileInput');
+  const browseBtn  = document.getElementById('browseBtn');
+  const dropScreen = document.getElementById('dropScreen');
+  const listScreen = document.getElementById('listScreen');
+  const fileList   = document.getElementById('fileList');
+  const backBtn    = document.getElementById('backBtn');
+  const closeBtn   = document.getElementById('closeBtn');
+  const cancelBtn  = document.getElementById('cancelBtn');
+  const pauseBtn   = document.getElementById('pauseBtn');
+  const statusBar  = document.getElementById('statusBar');
+  const statusLabel= document.getElementById('statusLabel');
+  const statusPct  = document.getElementById('statusPct');
+  const statusFill = document.getElementById('statusFill');
+  const statusSize = document.getElementById('statusSize');
+  const statusTime = document.getElementById('statusTime');
+  const spinner    = document.getElementById('spinner');
+
+  let files = [];      // {id, name, sizeMB, pct, timer}
+  let paused = false;
+  let idSeq = 0;
+
+  browseBtn.addEventListener('click', () => fileInput.click());
+  dropArea.addEventListener('click', (e) => { if(e.target === dropArea) fileInput.click(); });
+  fileInput.addEventListener('change', e => addFiles(e.target.files));
+
+  ['dragover','dragenter'].forEach(evt =>
+    dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.add('drag'); })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    dropArea.addEventListener(evt, e => { e.preventDefault(); dropArea.classList.remove('drag'); })
+  );
+  dropArea.addEventListener('drop', e => { if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+
+  function addFiles(fileObjs){
+    Array.from(fileObjs).forEach(f => {
+      const entry = {
+        id: 'f' + (idSeq++),
+        name: f.name,
+        sizeMB: Math.max(1, Math.round((f.size / (1024*1024)) * 10) / 10 || (10 + Math.random()*150)),
+        pct: 0
+      };
+      files.push(entry);
+    });
+    renderList();
+    showListScreen();
+    statusBar.style.display = 'block';
+    startTimers();
+  }
+
+  function folderIcon(){
+    return `<svg width="30" height="24" viewBox="0 0 46 38" fill="none">
+      <path d="M2 8a4 4 0 014-4h9l4 5h21a4 4 0 014 4v17a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" fill="url(#g2)"/>
+      </svg>`;
+  }
+
+  function renderList(){
+    fileList.innerHTML = files.map(f => `
+      <div class="file-row" data-id="${f.id}">
+        <svg width="30" height="24" viewBox="0 0 46 38" fill="none">
+          <path d="M2 8a4 4 0 014-4h9l4 5h21a4 4 0 014 4v17a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" fill="url(#folderGrad)"/>
+        </svg>
+        <div class="file-info">
+          <p class="file-name">${f.name}</p>
+          <p class="file-meta">${f.sizeMB.toFixed(0)}MB</p>
+        </div>
+        <div class="pct-pill">${Math.floor(f.pct)}</div>
+        <button class="row-x" data-remove="${f.id}">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    `).join('');
+
+    fileList.querySelectorAll('[data-remove]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-remove');
+        files = files.filter(f => f.id !== id);
+        renderList();
+        updateStatus();
+        if (files.length === 0) resetAll();
+      });
+    });
+  }
+
+  function showListScreen(){
+    dropScreen.style.display = 'none';
+    listScreen.style.display = 'block';
+  }
+  function showDropScreen(){
+    listScreen.style.display = 'none';
+    dropScreen.style.display = 'block';
+  }
+
+  backBtn.addEventListener('click', showDropScreen);
+  closeBtn.addEventListener('click', resetAll);
+  cancelBtn.addEventListener('click', resetAll);
+
+  pauseBtn.addEventListener('click', () => {
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Resume' : 'Pause';
+    spinner.classList.toggle('paused', paused);
+  });
+
+  let masterTimer = null;
+  function startTimers(){
+    if (masterTimer) return;
+    masterTimer = setInterval(() => {
+      if (paused) return;
+      let anyActive = false;
+      files.forEach(f => {
+        if (f.pct < 100){
+          f.pct = Math.min(100, f.pct + (4 + Math.random()*9));
+          anyActive = true;
+        }
+      });
+      files.forEach(f => {
+        const pill = fileList.querySelector(`.file-row[data-id="${f.id}"] .pct-pill`);
+        if (pill) pill.textContent = Math.floor(f.pct);
+      });
+      updateStatus();
+      if (!anyActive){
+        clearInterval(masterTimer);
+        masterTimer = null;
+      }
+    }, 220);
+  }
+
+  function updateStatus(){
+    const total = files.length;
+    const done = files.filter(f => f.pct >= 100).length;
+    const totalSize = files.reduce((s,f)=>s+f.sizeMB,0);
+    const uploadedSize = files.reduce((s,f)=>s+ (f.sizeMB * f.pct/100), 0);
+    const overallPct = total ? Math.floor(uploadedSize / totalSize * 100) : 0;
+
+    const isDone = total > 0 && done === total;
+
+    statusLabel.textContent = isDone ? `Uploaded ${done}/${total}` : `Uploading ${done}/${total}`;
+    statusPct.textContent = overallPct + '%';
+    statusFill.style.width = overallPct + '%';
+    statusSize.textContent = `${Math.round(uploadedSize)}MB of ${Math.round(totalSize)}MB`;
+    statusTime.textContent = isDone ? '0 sec' : Math.max(1, Math.round((100-overallPct)/8)) + ' sec';
+
+    spinner.classList.toggle('done', isDone);
+    pauseBtn.disabled = isDone;
+    pauseBtn.style.opacity = isDone ? '0.45' : '1';
+    pauseBtn.style.cursor = isDone ? 'default' : 'pointer';
+
+    if (total === 0){
+      statusBar.style.display = 'none';
+    }
+  }
+
+  function resetAll(){
+    files = [];
+    paused = false;
+    pauseBtn.textContent = 'Pause';
+    pauseBtn.disabled = false;
+    pauseBtn.style.opacity = '1';
+    pauseBtn.style.cursor = 'pointer';
+    spinner.classList.remove('paused', 'done');
+    if (masterTimer){ clearInterval(masterTimer); masterTimer = null; }
+    fileList.innerHTML = '';
+    statusBar.style.display = 'none';
+    fileInput.value = '';
+    showDropScreen();
+  }
+
+  // shared gradient def (referenced by folder icons rendered via innerHTML)
+  document.body.insertAdjacentHTML('beforeend', `
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="folderGrad" x1="2" y1="4" x2="44" y2="34" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#6BD3FF"/>
+          <stop offset="1" stop-color="#2B9FE0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  `);
+</script>
+</body>
+</html>
