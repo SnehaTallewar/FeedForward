@@ -1,0 +1,11 @@
+feedback_id,text,channel,timestamp
+FB0001,Cannot reset my password via email link.,Social Media,2026-09-02
+FB0002,Cannot reset my password via email link.,App,2026-09-07
+FB0003,The search bar does not return accurate results.,App,2026-09-02
+FB0004,"Great user interface, easy to navigate.",Email,2026-09-05
+FB0005,App logout happens automatically every hour.,Email,2026-09-05
+FB0006,The checkout page is extremely slow.,Website,2026-09-03
+FB0007,The application crashes when I upload a photo.,Social Media,2026-09-11
+FB0008,Push notifications are not working properly.,Social Media,2026-09-03
+FB0009,Payment failed twice during checkout.,Email,2026-09-01
+FB0010,The search bar does not return accurate results.,App,2026-09-01

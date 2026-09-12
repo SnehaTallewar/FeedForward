@@ -1,0 +1,11 @@
+feedback_id,text,channel,timestamp
+FB0011,App logout happens automatically every hour.,Social Media,2026-09-01
+FB0012,App logout happens automatically every hour.,Chatbot,2026-09-10
+FB0013,My card payment doesn't go through.,Social Media,2026-09-04
+FB0014,The dark mode feature looks amazing!,App,2026-09-09
+FB0015,Payment failed twice during checkout.,Chatbot,2026-09-06
+FB0016,Received wrong item size in the package.,Chatbot,2026-09-11
+FB0017,Cannot reset my password via email link.,App,2026-09-05
+FB0018,Received wrong item size in the package.,Website,2026-09-09
+FB0019,Cannot reset my password via email link.,Email,2026-09-01
+FB0020,"Great user interface, easy to navigate.",Social Media,2026-09-08

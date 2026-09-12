@@ -1,0 +1,51 @@
+feedback_id,text,channel,timestamp
+FB0071,Order status doesn't update in real time.,App,2026-08-12
+FB0072,App logout happens automatically every hour.,App,2026-08-23
+FB0073,Push notifications are delayed.,Web Portal,2026-08-21
+FB0074,"Great product overall, highly recommended.",App,2026-08-10
+FB0075,Biometric login fails frequently.,Email,2026-08-01
+FB0076,Love the new user interface update!,App,2026-08-24
+FB0077,Payment failed twice during checkout.,App,2026-09-01
+FB0078,Easy to navigate and very intuitive design.,Chatbot,2026-08-21
+FB0079,"Refund was processed quickly, thanks!",Chatbot,2026-08-27
+FB0080,Easy to navigate and very intuitive design.,App,2026-09-05
+FB0081,Love the new user interface update!,App,2026-08-11
+FB0082,The dark mode feature looks amazing!,Email,2026-08-01
+FB0083,Easy to navigate and very intuitive design.,App,2026-08-09
+FB0084,Account verification process took too long.,App,2026-09-01
+FB0085,Customer service response time is too slow.,Web Portal,2026-08-13
+FB0086,Search functionality isn't returning accurate results.,Web Portal,2026-08-07
+FB0087,Love the new user interface update!,Chatbot,2026-08-24
+FB0088,My card payment doesn't go through.,Social Media,2026-08-02
+FB0089,Order status doesn't update in real time.,Web Portal,2026-08-03
+FB0090,"Great product overall, highly recommended.",Social Media,2026-08-11
+FB0091,Unable to update profile picture on mobile.,Email,2026-08-28
+FB0092,Love the new user interface update!,Web Portal,2026-08-07
+FB0093,Search functionality isn't returning accurate results.,App,2026-08-15
+FB0094,Order status doesn't update in real time.,Web Portal,2026-08-11
+FB0095,Easy to navigate and very intuitive design.,App,2026-09-01
+FB0096,Payment failed twice during checkout.,Web Portal,2026-09-06
+FB0097,Push notifications are delayed.,App,2026-09-08
+FB0098,Order status doesn't update in real time.,Chatbot,2026-08-22
+FB0099,"Refund was processed quickly, thanks!",Web Portal,2026-08-14
+FB0100,Push notifications are delayed.,Social Media,2026-09-03
+FB0101,Account verification process took too long.,App,2026-08-20
+FB0102,Customer service response time is too slow.,Email,2026-08-18
+FB0103,My card payment doesn't go through.,App,2026-08-26
+FB0104,Biometric login fails frequently.,Web Portal,2026-08-21
+FB0105,"Refund was processed quickly, thanks!",Chatbot,2026-08-23
+FB0106,"Refund was processed quickly, thanks!",App,2026-08-26
+FB0107,App logout happens automatically every hour.,App,2026-08-15
+FB0108,Biometric login fails frequently.,Email,2026-08-24
+FB0109,Customer service response time is too slow.,Social Media,2026-08-02
+FB0110,Customer service response time is too slow.,Web Portal,2026-08-15
+FB0111,Love the new user interface update!,Email,2026-09-08
+FB0112,"Refund was processed quickly, thanks!",App,2026-09-10
+FB0113,"Refund was processed quickly, thanks!",Email,2026-08-07
+FB0114,Search functionality isn't returning accurate results.,Web Portal,2026-08-06
+FB0115,Unable to update profile picture on mobile.,Social Media,2026-08-12
+FB0116,Payment failed twice during checkout.,Chatbot,2026-09-09
+FB0117,Unable to update profile picture on mobile.,Email,2026-08-06
+FB0118,The dark mode feature looks amazing!,Chatbot,2026-08-02
+FB0119,Biometric login fails frequently.,App,2026-08-07
+FB0120,"Great product overall, highly recommended.",Email,2026-08-24
